@@ -22795,7 +22795,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var valid = true;
 	        var filterVal = undefined;
 	        for (var key in filterObj) {
-	          var targetVal = row[key];
+	          var targetVal = null;
+
+	          if (key.indexOf('.') !== -1) {
+	            var depth = key.split('.');
+	            while (depth.length > 0) {
+	              targetVal = targetVal ? targetVal[depth.shift()] : row[depth.shift()];
+	            }
+	          } else {
+	            targetVal = row[key];
+	          }
 	          if (targetVal === null || targetVal === undefined) {
 	            targetVal = '';
 	          }

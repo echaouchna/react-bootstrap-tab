@@ -385,7 +385,16 @@ export class TableDataStore {
       let valid = true;
       let filterVal;
       for (const key in filterObj) {
-        let targetVal = row[key];
+        let targetVal = null;
+
+        if ( key.indexOf('.') !== -1 ) {
+          const depth = key.split('.');
+          while (depth.length > 0) {
+            targetVal = targetVal ? targetVal[depth.shift()] : row[depth.shift()];
+          }
+        } else {
+          targetVal = row[key];
+        }
         if (targetVal === null || targetVal === undefined) {
           targetVal = '';
         }

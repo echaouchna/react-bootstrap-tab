@@ -5,15 +5,15 @@
 /* eslint one-var: 0 */
 import Const from '../Const';
 
-function _sort(arr, sortField, order, sortFunc, sortFuncExtraData) {
+function _sort(arr, sortField, order, sortFunc, sortFuncExtraData, that) {
   order = order.toLowerCase();
   const isDesc = order === Const.SORT_DESC;
   arr.sort((a, b) => {
     if (sortFunc) {
       return sortFunc(a, b, order, sortField, sortFuncExtraData);
     } else {
-      const valueATemp = this._getByPath(sortField, a);
-      const valueBTemp = this._getByPath(sortField, b);
+      const valueATemp = that._getByPath(sortField, a);
+      const valueBTemp = that._getByPath(sortField, b);
       const valueA = valueATemp === null ? '' : valueATemp;
       const valueB = valueBTemp === null ? '' : valueBTemp;
       if (isDesc) {
@@ -134,7 +134,12 @@ export class TableDataStore {
     if (!this.colInfos[sortField]) return this;
 
     const { sortFunc, sortFuncExtraData } = this.colInfos[sortField];
-    currentDisplayData = _sort(currentDisplayData, sortField, order, sortFunc, sortFuncExtraData);
+    currentDisplayData = _sort(currentDisplayData,
+       sortField,
+       order,
+       sortFunc,
+       sortFuncExtraData,
+       this);
 
     return this;
   }

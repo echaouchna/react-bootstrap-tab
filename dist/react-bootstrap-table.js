@@ -22360,14 +22360,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _Const2 = _interopRequireDefault(_Const);
 
 	function _sort(arr, sortField, order, sortFunc, sortFuncExtraData) {
+	  var _this = this;
+
 	  order = order.toLowerCase();
 	  var isDesc = order === _Const2['default'].SORT_DESC;
 	  arr.sort(function (a, b) {
 	    if (sortFunc) {
 	      return sortFunc(a, b, order, sortField, sortFuncExtraData);
 	    } else {
-	      var valueA = a[sortField] === null ? '' : a[sortField];
-	      var valueB = b[sortField] === null ? '' : b[sortField];
+	      var valueATemp = _this._getByPath(sortField, a);
+	      var valueBTemp = _this._getByPath(sortField, b);
+	      var valueA = valueATemp === null ? '' : valueATemp;
+	      var valueB = valueBTemp === null ? '' : valueBTemp;
 	      if (isDesc) {
 	        if (typeof valueB === 'string') {
 	          return valueB.localeCompare(valueA);
@@ -22450,11 +22454,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'getRowByKey',
 	    value: function getRowByKey(keys) {
-	      var _this = this;
+	      var _this2 = this;
 
 	      return keys.map(function (key) {
-	        var result = _this.data.filter(function (d) {
-	          return d[_this.keyField] === key;
+	        var result = _this2.data.filter(function (d) {
+	          return d[_this2.keyField] === key;
 	        });
 	        if (result.length !== 0) return result[0];
 	      });
@@ -22483,14 +22487,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'ignoreNonSelected',
 	    value: function ignoreNonSelected() {
-	      var _this2 = this;
+	      var _this3 = this;
 
 	      this.showOnlySelected = !this.showOnlySelected;
 	      if (this.showOnlySelected) {
 	        this.isOnFilter = true;
 	        this.filteredData = this.data.filter(function (row) {
-	          var result = _this2.selected.find(function (x) {
-	            return row[_this2.keyField] === x;
+	          var result = _this3.selected.find(function (x) {
+	            return row[_this3.keyField] === x;
 	          });
 	          return typeof result !== 'undefined' ? true : false;
 	        });
@@ -22584,16 +22588,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'remove',
 	    value: function remove(rowKey) {
-	      var _this3 = this;
+	      var _this4 = this;
 
 	      var currentDisplayData = this.getCurrentDisplayData();
 	      var result = currentDisplayData.filter(function (row) {
-	        return rowKey.indexOf(row[_this3.keyField]) === -1;
+	        return rowKey.indexOf(row[_this4.keyField]) === -1;
 	      });
 
 	      if (this.isOnFilter) {
 	        this.data = this.data.filter(function (row) {
-	          return rowKey.indexOf(row[_this3.keyField]) === -1;
+	          return rowKey.indexOf(row[_this4.keyField]) === -1;
 	        });
 	        this.filteredData = result;
 	      } else {
@@ -22786,25 +22790,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    }
 	  }, {
+	    key: '_getByPath',
+	    value: function _getByPath(key, objElement) {
+	      var targetVal = null;
+
+	      if (key.indexOf('.') !== -1) {
+	        var depth = key.split('.');
+	        while (depth.length > 0) {
+	          targetVal = targetVal ? targetVal[depth.shift()] : objElement[depth.shift()];
+	        }
+	      } else {
+	        targetVal = objElement[key];
+	      }
+
+	      return targetVal;
+	    }
+	  }, {
 	    key: '_filter',
 	    value: function _filter(source) {
-	      var _this4 = this;
+	      var _this5 = this;
 
 	      var filterObj = this.filterObj;
 	      this.filteredData = source.filter(function (row, r) {
 	        var valid = true;
 	        var filterVal = undefined;
 	        for (var key in filterObj) {
-	          var targetVal = null;
+	          var targetVal = _this5._getByPath(key, row);
 
-	          if (key.indexOf('.') !== -1) {
-	            var depth = key.split('.');
-	            while (depth.length > 0) {
-	              targetVal = targetVal ? targetVal[depth.shift()] : row[depth.shift()];
-	            }
-	          } else {
-	            targetVal = row[key];
-	          }
 	          if (targetVal === null || targetVal === undefined) {
 	            targetVal = '';
 	          }
@@ -22844,11 +22856,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	              filterFormatted = undefined,
 	              formatExtraData = undefined,
 	              filterValue = undefined;
-	          if (_this4.colInfos[key]) {
-	            format = _this4.colInfos[key].format;
-	            filterFormatted = _this4.colInfos[key].filterFormatted;
-	            formatExtraData = _this4.colInfos[key].formatExtraData;
-	            filterValue = _this4.colInfos[key].filterValue;
+	          if (_this5.colInfos[key]) {
+	            format = _this5.colInfos[key].format;
+	            filterFormatted = _this5.colInfos[key].filterFormatted;
+	            formatExtraData = _this5.colInfos[key].formatExtraData;
+	            filterValue = _this5.colInfos[key].filterValue;
 	            if (filterFormatted && format) {
 	              targetVal = format(row[key], row, formatExtraData, r);
 	            } else if (filterValue) {
@@ -22859,22 +22871,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	          switch (filterObj[key].type) {
 	            case _Const2['default'].FILTER_TYPE.NUMBER:
 	              {
-	                valid = _this4.filterNumber(targetVal, filterVal, filterObj[key].value.comparator);
+	                valid = _this5.filterNumber(targetVal, filterVal, filterObj[key].value.comparator);
 	                break;
 	              }
 	            case _Const2['default'].FILTER_TYPE.DATE:
 	              {
-	                valid = _this4.filterDate(targetVal, filterVal, filterObj[key].value.comparator);
+	                valid = _this5.filterDate(targetVal, filterVal, filterObj[key].value.comparator);
 	                break;
 	              }
 	            case _Const2['default'].FILTER_TYPE.REGEX:
 	              {
-	                valid = _this4.filterRegex(targetVal, filterVal);
+	                valid = _this5.filterRegex(targetVal, filterVal);
 	                break;
 	              }
 	            case _Const2['default'].FILTER_TYPE.CUSTOM:
 	              {
-	                valid = _this4.filterCustom(targetVal, filterVal, filterObj[key].value);
+	                valid = _this5.filterCustom(targetVal, filterVal, filterObj[key].value);
 	                break;
 	              }
 	            default:
@@ -22882,7 +22894,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                if (filterObj[key].type === _Const2['default'].FILTER_TYPE.SELECT && filterFormatted && filterFormatted && format) {
 	                  filterVal = format(filterVal, row, formatExtraData, r);
 	                }
-	                valid = _this4.filterText(targetVal, filterVal);
+	                valid = _this5.filterText(targetVal, filterVal);
 	                break;
 	              }
 	          }
@@ -22897,7 +22909,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_search',
 	    value: function _search(source) {
-	      var _this5 = this;
+	      var _this6 = this;
 
 	      var searchTextArray = [];
 
@@ -22919,8 +22931,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	          if (!isNaN(row[key]) && parseInt(row[key], 10) === 0) {
 	            filterSpecialNum = true;
 	          }
-	          if (_this5.colInfos[key] && (row[key] || filterSpecialNum)) {
-	            var _colInfos$key = _this5.colInfos[key];
+	          if (_this6.colInfos[key] && (row[key] || filterSpecialNum)) {
+	            var _colInfos$key = _this6.colInfos[key];
 	            var format = _colInfos$key.format;
 	            var filterFormatted = _colInfos$key.filterFormatted;
 	            var filterValue = _colInfos$key.filterValue;
@@ -22994,10 +23006,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'getAllRowkey',
 	    value: function getAllRowkey() {
-	      var _this6 = this;
+	      var _this7 = this;
 
 	      return this.data.map(function (row) {
-	        return row[_this6.keyField];
+	        return row[_this7.keyField];
 	      });
 	    }
 	  }]);

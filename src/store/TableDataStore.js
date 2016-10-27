@@ -12,8 +12,10 @@ function _sort(arr, sortField, order, sortFunc, sortFuncExtraData) {
     if (sortFunc) {
       return sortFunc(a, b, order, sortField, sortFuncExtraData);
     } else {
-      const valueA = a[sortField] === null ? '' : a[sortField];
-      const valueB = b[sortField] === null ? '' : b[sortField];
+      const valueATemp = this._getByPath(sortField, a);
+      const valueBTemp = this._getByPath(sortField, b);
+      const valueA = valueATemp === null ? '' : valueATemp;
+      const valueB = valueBTemp === null ? '' : valueBTemp;
       if (isDesc) {
         if (typeof valueB === 'string') {
           return valueB.localeCompare(valueA);
@@ -379,22 +381,29 @@ export class TableDataStore {
     }
   }
 
+  _getByPath(key, objElement) {
+    let targetVal = null;
+
+    if ( key.indexOf('.') !== -1 ) {
+      const depth = key.split('.');
+      while (depth.length > 0) {
+        targetVal = targetVal ? targetVal[depth.shift()] : objElement[depth.shift()];
+      }
+    } else {
+      targetVal = objElement[key];
+    }
+
+    return targetVal;
+  }
+
   _filter(source) {
     const filterObj = this.filterObj;
     this.filteredData = source.filter((row, r) => {
       let valid = true;
       let filterVal;
       for (const key in filterObj) {
-        let targetVal = null;
+        let targetVal = this._getByPath(key, row);
 
-        if ( key.indexOf('.') !== -1 ) {
-          const depth = key.split('.');
-          while (depth.length > 0) {
-            targetVal = targetVal ? targetVal[depth.shift()] : row[depth.shift()];
-          }
-        } else {
-          targetVal = row[key];
-        }
         if (targetVal === null || targetVal === undefined) {
           targetVal = '';
         }

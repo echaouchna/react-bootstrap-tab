@@ -22359,15 +22359,30 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _Const2 = _interopRequireDefault(_Const);
 
-	function _sort(arr, sortField, order, sortFunc, sortFuncExtraData, that) {
+	function _getByPath(key, objElement) {
+	  var targetVal = null;
+
+	  if (key.indexOf('.') !== -1) {
+	    var depth = key.split('.');
+	    while (depth.length > 0) {
+	      targetVal = targetVal ? targetVal[depth.shift()] : objElement[depth.shift()];
+	    }
+	  } else {
+	    targetVal = objElement[key];
+	  }
+
+	  return targetVal;
+	}
+
+	function _sort(arr, sortField, order, sortFunc, sortFuncExtraData) {
 	  order = order.toLowerCase();
 	  var isDesc = order === _Const2['default'].SORT_DESC;
 	  arr.sort(function (a, b) {
 	    if (sortFunc) {
 	      return sortFunc(a, b, order, sortField, sortFuncExtraData);
 	    } else {
-	      var valueATemp = that._getByPath(sortField, a);
-	      var valueBTemp = that._getByPath(sortField, b);
+	      var valueATemp = _getByPath(sortField, a);
+	      var valueBTemp = _getByPath(sortField, b);
 	      var valueA = valueATemp === null ? '' : valueATemp;
 	      var valueB = valueBTemp === null ? '' : valueBTemp;
 	      if (isDesc) {
@@ -22512,7 +22527,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var sortFunc = _colInfos$sortField.sortFunc;
 	      var sortFuncExtraData = _colInfos$sortField.sortFuncExtraData;
 
-	      currentDisplayData = _sort(currentDisplayData, sortField, order, sortFunc, sortFuncExtraData, this);
+	      currentDisplayData = _sort(currentDisplayData, sortField, order, sortFunc, sortFuncExtraData);
 
 	      return this;
 	    }
@@ -22788,22 +22803,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    }
 	  }, {
-	    key: '_getByPath',
-	    value: function _getByPath(key, objElement) {
-	      var targetVal = null;
-
-	      if (key.indexOf('.') !== -1) {
-	        var depth = key.split('.');
-	        while (depth.length > 0) {
-	          targetVal = targetVal ? targetVal[depth.shift()] : objElement[depth.shift()];
-	        }
-	      } else {
-	        targetVal = objElement[key];
-	      }
-
-	      return targetVal;
-	    }
-	  }, {
 	    key: '_filter',
 	    value: function _filter(source) {
 	      var _this4 = this;
@@ -22813,7 +22812,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var valid = true;
 	        var filterVal = undefined;
 	        for (var key in filterObj) {
-	          var targetVal = _this4._getByPath(key, row);
+	          var targetVal = _getByPath(key, row);
 
 	          if (targetVal === null || targetVal === undefined) {
 	            targetVal = '';
@@ -22917,19 +22916,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	        searchTextArray.push(this.searchText);
 	      }
 	      this.filteredData = source.filter(function (row, r) {
-	        var keys = Object.keys(row);
+	        var keys = Object.keys(_this5.colInfos);
 	        var valid = false;
 	        // for loops are ugly, but performance matters here.
 	        // And you cant break from a forEach.
 	        // http://jsperf.com/for-vs-foreach/66
 	        for (var i = 0, keysLength = keys.length; i < keysLength; i++) {
 	          var key = keys[i];
+	          var cellValue = _getByPath(key, row);
 	          // fixed data filter when misunderstand 0 is false
 	          var filterSpecialNum = false;
-	          if (!isNaN(row[key]) && parseInt(row[key], 10) === 0) {
+	          if (!isNaN(cellValue) && parseInt(cellValue, 10) === 0) {
 	            filterSpecialNum = true;
 	          }
-	          if (_this5.colInfos[key] && (row[key] || filterSpecialNum)) {
+	          if (_this5.colInfos[key] && (cellValue || filterSpecialNum)) {
 	            var _colInfos$key = _this5.colInfos[key];
 	            var format = _colInfos$key.format;
 	            var filterFormatted = _colInfos$key.filterFormatted;
@@ -22937,7 +22937,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var formatExtraData = _colInfos$key.formatExtraData;
 	            var searchable = _colInfos$key.searchable;
 
-	            var targetVal = row[key];
+	            var targetVal = cellValue;
 	            if (searchable) {
 	              if (filterFormatted && format) {
 	                targetVal = format(targetVal, row, formatExtraData, r);

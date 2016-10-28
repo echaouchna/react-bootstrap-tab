@@ -5,15 +5,30 @@
 /* eslint one-var: 0 */
 import Const from '../Const';
 
-function _sort(arr, sortField, order, sortFunc, sortFuncExtraData, that) {
+function _getByPath(key, objElement) {
+  let targetVal = null;
+
+  if ( key.indexOf('.') !== -1 ) {
+    const depth = key.split('.');
+    while (depth.length > 0) {
+      targetVal = targetVal ? targetVal[depth.shift()] : objElement[depth.shift()];
+    }
+  } else {
+    targetVal = objElement[key];
+  }
+
+  return targetVal;
+}
+
+function _sort(arr, sortField, order, sortFunc, sortFuncExtraData) {
   order = order.toLowerCase();
   const isDesc = order === Const.SORT_DESC;
   arr.sort((a, b) => {
     if (sortFunc) {
       return sortFunc(a, b, order, sortField, sortFuncExtraData);
     } else {
-      const valueATemp = that._getByPath(sortField, a);
-      const valueBTemp = that._getByPath(sortField, b);
+      const valueATemp = _getByPath(sortField, a);
+      const valueBTemp = _getByPath(sortField, b);
       const valueA = valueATemp === null ? '' : valueATemp;
       const valueB = valueBTemp === null ? '' : valueBTemp;
       if (isDesc) {
@@ -138,8 +153,7 @@ export class TableDataStore {
        sortField,
        order,
        sortFunc,
-       sortFuncExtraData,
-       this);
+       sortFuncExtraData);
 
     return this;
   }
@@ -386,28 +400,13 @@ export class TableDataStore {
     }
   }
 
-  _getByPath(key, objElement) {
-    let targetVal = null;
-
-    if ( key.indexOf('.') !== -1 ) {
-      const depth = key.split('.');
-      while (depth.length > 0) {
-        targetVal = targetVal ? targetVal[depth.shift()] : objElement[depth.shift()];
-      }
-    } else {
-      targetVal = objElement[key];
-    }
-
-    return targetVal;
-  }
-
   _filter(source) {
     const filterObj = this.filterObj;
     this.filteredData = source.filter((row, r) => {
       let valid = true;
       let filterVal;
       for (const key in filterObj) {
-        let targetVal = this._getByPath(key, row);
+        let targetVal = _getByPath(key, row);
 
         if (targetVal === null || targetVal === undefined) {
           targetVal = '';
@@ -502,18 +501,19 @@ export class TableDataStore {
       searchTextArray.push(this.searchText);
     }
     this.filteredData = source.filter((row, r) => {
-      const keys = Object.keys(row);
+      const keys = Object.keys(this.colInfos);
       let valid = false;
       // for loops are ugly, but performance matters here.
       // And you cant break from a forEach.
       // http://jsperf.com/for-vs-foreach/66
       for (let i = 0, keysLength = keys.length; i < keysLength; i++) {
         const key = keys[i];
+        const cellValue = _getByPath(key, row);
         // fixed data filter when misunderstand 0 is false
         let filterSpecialNum = false;
-        if (!isNaN(row[key]) &&
-          parseInt(row[key], 10) === 0) { filterSpecialNum = true; }
-        if (this.colInfos[key] && (row[key] || filterSpecialNum)) {
+        if (!isNaN(cellValue) &&
+          parseInt(cellValue, 10) === 0) { filterSpecialNum = true; }
+        if (this.colInfos[key] && (cellValue || filterSpecialNum)) {
           const {
             format,
             filterFormatted,
@@ -521,7 +521,7 @@ export class TableDataStore {
             formatExtraData,
             searchable
           } = this.colInfos[key];
-          let targetVal = row[key];
+          let targetVal = cellValue;
           if (searchable) {
             if (filterFormatted && format) {
               targetVal = format(targetVal, row, formatExtraData, r);

@@ -28,40 +28,43 @@ class TableHeaderColumn extends Component {
   }
 
   getFilters() {
+    const { headerText, children } = this.props;
     switch (this.props.filter.type) {
     case Const.FILTER_TYPE.TEXT: {
       return (
         <TextFilter ref='textFilter' { ...this.props.filter }
-          columnName={ this.props.children } filterHandler={ this.handleFilter } />
+          columnName={ headerText || children } filterHandler={ this.handleFilter } />
       );
     }
     case Const.FILTER_TYPE.REGEX: {
       return (
         <RegexFilter ref='regexFilter' { ...this.props.filter }
-          columnName={ this.props.children } filterHandler={ this.handleFilter } />
+          columnName={ headerText || children } filterHandler={ this.handleFilter } />
       );
     }
     case Const.FILTER_TYPE.SELECT: {
       return (
         <SelectFilter ref='selectFilter' { ...this.props.filter }
-          columnName={ this.props.children } filterHandler={ this.handleFilter } />
+          columnName={ headerText || children } filterHandler={ this.handleFilter } />
       );
     }
     case Const.FILTER_TYPE.NUMBER: {
       return (
         <NumberFilter ref='numberFilter' { ...this.props.filter }
-          columnName={ this.props.children } filterHandler={ this.handleFilter } />
+          columnName={ headerText || children } filterHandler={ this.handleFilter } />
       );
     }
     case Const.FILTER_TYPE.DATE: {
       return (
         <DateFilter ref='dateFilter' { ...this.props.filter }
-          columnName={ this.props.children } filterHandler={ this.handleFilter } />
+          columnName={ headerText || children } filterHandler={ this.handleFilter } />
       );
     }
     case Const.FILTER_TYPE.CUSTOM: {
-      return this.props.filter.getElement(this.handleFilter,
+      const elm = this.props.filter.getElement(this.handleFilter,
           this.props.filter.customFilterParameters);
+
+      return React.cloneElement(elm, { ref: 'customFilter' });
     }
     }
   }
@@ -73,9 +76,11 @@ class TableHeaderColumn extends Component {
   render() {
     let defaultCaret;
     const {
+      headerText,
       dataAlign,
       dataField,
       headerAlign,
+      headerTitle,
       hidden,
       sort,
       dataSort,
@@ -108,7 +113,9 @@ class TableHeaderColumn extends Component {
       typeof className === 'function' ? className() : className,
       dataSort ? 'sort-column' : '');
 
-    const title = typeof children === 'string' ? { title: children } : null;
+    const title = {
+      title: ((headerTitle && typeof children === 'string') ? children : headerText)
+    };
     return (
       <th ref='header-col'
           className={ classes }
@@ -147,6 +154,10 @@ class TableHeaderColumn extends Component {
     }
     case Const.FILTER_TYPE.DATE: {
       this.refs.dateFilter.cleanFiltered();
+      break;
+    }
+    case Const.FILTER_TYPE.CUSTOM: {
+      this.refs.customFilter.cleanFiltered();
       break;
     }
     }
@@ -188,6 +199,8 @@ TableHeaderColumn.propTypes = {
   dataField: PropTypes.string,
   dataAlign: PropTypes.string,
   headerAlign: PropTypes.string,
+  headerTitle: PropTypes.bool,
+  headerText: PropTypes.string,
   dataSort: PropTypes.bool,
   onSort: PropTypes.func,
   dataFormat: PropTypes.func,
@@ -206,6 +219,7 @@ TableHeaderColumn.propTypes = {
   sortFunc: PropTypes.func,
   sortFuncExtraData: PropTypes.any,
   columnClassName: PropTypes.any,
+  editColumnClassName: PropTypes.any,
   columnTitle: PropTypes.bool,
   filterFormatted: PropTypes.bool,
   filterValue: PropTypes.func,
@@ -226,12 +240,14 @@ TableHeaderColumn.propTypes = {
     customFilterParameters: PropTypes.object
   }),
   sortIndicator: PropTypes.bool,
-  export: PropTypes.bool
+  export: PropTypes.bool,
+  expandable: PropTypes.bool
 };
 
 TableHeaderColumn.defaultProps = {
   dataAlign: 'left',
   headerAlign: undefined,
+  headerTitle: true,
   dataSort: false,
   dataFormat: undefined,
   csvFormat: undefined,
@@ -247,13 +263,15 @@ TableHeaderColumn.defaultProps = {
   width: null,
   sortFunc: undefined,
   columnClassName: '',
+  editColumnClassName: '',
   filterFormatted: false,
   filterValue: undefined,
   sort: undefined,
   formatExtraData: undefined,
   sortFuncExtraData: undefined,
   filter: undefined,
-  sortIndicator: true
+  sortIndicator: true,
+  expandable: true
 };
 
 export default TableHeaderColumn;

@@ -55,41 +55,61 @@ class TableColumn extends Component {
       }
     }
     this.props.onEdit(
-      e.currentTarget.parentElement.rowIndex + 1,
+      this.props.rIndex + 1,
+      e.currentTarget.cellIndex,
+      e);
+  }
+
+  handleCellClick = e => {
+    this.props.onClick(this.props.rIndex + 1,
       e.currentTarget.cellIndex,
       e);
   }
 
   render() {
+    const {
+      children,
+      columnTitle,
+      className,
+      dataAlign,
+      hidden,
+      cellEdit
+    } = this.props;
+
     const tdStyle = {
-      textAlign: this.props.dataAlign,
-      display: this.props.hidden ? 'none' : null
+      textAlign: dataAlign,
+      display: hidden ? 'none' : null
     };
 
     const opts = {};
-    if (this.props.cellEdit) {
-      if (this.props.cellEdit.mode === Const.CELL_EDIT_CLICK) {
+
+    if (cellEdit) {
+      if (cellEdit.mode === Const.CELL_EDIT_CLICK) {
         opts.onClick = this.handleCellEdit;
-      } else if (this.props.cellEdit.mode === Const.CELL_EDIT_DBCLICK) {
+      } else if (cellEdit.mode === Const.CELL_EDIT_DBCLICK) {
         opts.onDoubleClick = this.handleCellEdit;
+      } else {
+        opts.onClick = this.handleCellClick;
       }
     }
     return (
       <td style={ tdStyle }
-          title={ this.props.columnTitle }
-          className={ this.props.className }
+          title={ columnTitle }
+          className={ className }
           { ...opts }>
-        { this.props.children }
+        { typeof children === 'boolean' ? children.toString() : children }
       </td>
     );
   }
 }
 TableColumn.propTypes = {
+  rIndex: PropTypes.number,
   dataAlign: PropTypes.string,
   hidden: PropTypes.bool,
   className: PropTypes.string,
   columnTitle: PropTypes.string,
-  children: PropTypes.node
+  children: PropTypes.node,
+  onClick: PropTypes.func
 };
 
 TableColumn.defaultProps = {

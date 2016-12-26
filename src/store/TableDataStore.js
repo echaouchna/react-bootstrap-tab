@@ -488,6 +488,23 @@ export class TableDataStore {
     this.isOnFilter = true;
   }
 
+  getKeysFromObject(obj) {
+    const allKeys = [];
+    const objectKeys = Object.keys(obj);
+    for (let i = 0; i < objectKeys.length; i++) {
+      const value = obj[objectKeys[i]];
+      if (typeof value === 'object') {
+        const subObjectKeys = this.getKeysFromObject(value);
+        for (let j = 0; j < subObjectKeys.length; j++) {
+          allKeys.push(objectKeys[i] + '.' + subObjectKeys[j]);
+        }
+      } else {
+        allKeys.push(objectKeys[i]);
+      }
+    }
+    return allKeys;
+  }
+
   _search(source) {
     let searchTextArray = [];
 
@@ -497,7 +514,7 @@ export class TableDataStore {
       searchTextArray.push(this.searchText);
     }
     this.filteredData = source.filter((row, r) => {
-      const keys = Object.keys(row);
+      const keys = this.getKeysFromObject(row);
       let valid = false;
       // for loops are ugly, but performance matters here.
       // And you cant break from a forEach.

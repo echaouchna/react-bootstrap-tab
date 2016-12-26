@@ -11345,7 +11345,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var objectKeys = Object.keys(obj);
 	      for (var i = 0; i < objectKeys.length; i++) {
 	        var value = obj[objectKeys[i]];
-	        if (value !== undefined && (typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object') {
+	        if (value !== null && value !== undefined && (typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object') {
 	          var subObjectKeys = this.getKeysFromObject(value);
 	          for (var j = 0; j < subObjectKeys.length; j++) {
 	            allKeys.push(objectKeys[i] + '.' + subObjectKeys[j]);

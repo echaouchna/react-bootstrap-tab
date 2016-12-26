@@ -493,7 +493,7 @@ export class TableDataStore {
     const objectKeys = Object.keys(obj);
     for (let i = 0; i < objectKeys.length; i++) {
       const value = obj[objectKeys[i]];
-      if (value !== undefined && typeof value === 'object') {
+      if (value !== null && value !== undefined && typeof value === 'object') {
         const subObjectKeys = this.getKeysFromObject(value);
         for (let j = 0; j < subObjectKeys.length; j++) {
           allKeys.push(objectKeys[i] + '.' + subObjectKeys[j]);

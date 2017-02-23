@@ -14486,7 +14486,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function sort() {
 	      var currentDisplayData = this.getCurrentDisplayData();
 
-	      currentDisplayData = _sort(currentDisplayData);
+	      currentDisplayData = this._sort(currentDisplayData);
 
 	      return this;
 	    }

@@ -1,7 +1,7 @@
 // this will build and serve the examples
 
-var path = require('path');
-var webpack = require('webpack');
+const path = require('path');
+const webpack = require('webpack');
 
 module.exports = {
   entry: {
@@ -50,6 +50,12 @@ module.exports = {
   plugins: [
     new webpack.optimize.CommonsChunkPlugin('vendors', 'vendors.js'),
     new webpack.HotModuleReplacementPlugin(),
-    new webpack.NoErrorsPlugin()
+    new webpack.NoErrorsPlugin(),
+    new webpack.ProgressPlugin(function(percentage, message) {
+      const percent = Math.round(percentage * 100);
+      process.stderr.clearLine();
+      process.stderr.cursorTo(0);
+      process.stderr.write(percent + '% ' + message);
+    })
   ]
 };

@@ -20,53 +20,6 @@ function _getByPath(key, objElement) {
   return targetVal;
 }
 
-function _sort(arr) {
-  if (this.sortList.length === 0 || typeof(this.sortList[0]) === 'undefined') {
-    return arr;
-  }
-
-  arr.sort((a, b) => {
-    let result = 0;
-
-    for (let i = 0; i < this.sortList.length; i++) {
-      const sortDetails = this.sortList[i];
-      const isDesc = sortDetails.order.toLowerCase() === Const.SORT_DESC;
-
-      const { sortFunc, sortFuncExtraData } = this.colInfos[sortDetails.sortField];
-
-      if (sortFunc) {
-          result = sortFunc(a, b, sortDetails.order, sortDetails.sortField, sortFuncExtraData);
-      } else {
-        const valueATemp = _getByPath(sortDetails.sortField, a);
-        const valueBTemp = _getByPath(sortDetails.sortField, b);
-        const valueA = valueATemp === null ? '' : valueATemp;
-        const valueB = valueBTemp === null ? '' : valueBTemp;
-        if (isDesc) {
-          if (typeof valueB === 'string') {
-            result = valueB.localeCompare(valueA);
-          } else {
-            result = valueA > valueB ? -1 : ((valueA < valueB) ? 1 : 0);
-          }
-        } else {
-          if (typeof valueA === 'string') {
-            result = valueA.localeCompare(valueB);
-          } else {
-            result = valueA < valueB ? -1 : ((valueA > valueB) ? 1 : 0);
-          }
-        }
-      }
-
-      if (result !== 0) {
-        return result;
-      }
-    }
-
-    return result;
-  });
-
-  return arr;
-}
-
 export class TableDataStore {
 
   constructor(data) {
@@ -641,10 +594,12 @@ export class TableDataStore {
         const { sortFunc, sortFuncExtraData } = this.colInfos[sortDetails.sortField];
 
         if (sortFunc) {
-          result = sortFunc(a, b, sortDetails.order, sortDetails.sortField, sortFuncExtraData);
+            result = sortFunc(a, b, sortDetails.order, sortDetails.sortField, sortFuncExtraData);
         } else {
-          const valueA = a[sortDetails.sortField] === null ? '' : a[sortDetails.sortField];
-          const valueB = b[sortDetails.sortField] === null ? '' : b[sortDetails.sortField];
+          const valueATemp = _getByPath(sortDetails.sortField, a);
+          const valueBTemp = _getByPath(sortDetails.sortField, b);
+          const valueA = valueATemp === null ? '' : valueATemp;
+          const valueB = valueBTemp === null ? '' : valueBTemp;
           if (isDesc) {
             if (typeof valueB === 'string') {
               result = valueB.localeCompare(valueA);

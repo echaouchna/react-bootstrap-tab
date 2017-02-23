@@ -14315,58 +14315,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return targetVal;
 	}
 
-	function _sort(arr) {
-	  var _this = this;
-
-	  if (this.sortList.length === 0 || typeof this.sortList[0] === 'undefined') {
-	    return arr;
-	  }
-
-	  arr.sort(function (a, b) {
-	    var result = 0;
-
-	    for (var i = 0; i < _this.sortList.length; i++) {
-	      var sortDetails = _this.sortList[i];
-	      var isDesc = sortDetails.order.toLowerCase() === _Const2.default.SORT_DESC;
-
-	      var _colInfos$sortDetails = _this.colInfos[sortDetails.sortField],
-	          sortFunc = _colInfos$sortDetails.sortFunc,
-	          sortFuncExtraData = _colInfos$sortDetails.sortFuncExtraData;
-
-
-	      if (sortFunc) {
-	        result = sortFunc(a, b, sortDetails.order, sortDetails.sortField, sortFuncExtraData);
-	      } else {
-	        var valueATemp = _getByPath(sortDetails.sortField, a);
-	        var valueBTemp = _getByPath(sortDetails.sortField, b);
-	        var valueA = valueATemp === null ? '' : valueATemp;
-	        var valueB = valueBTemp === null ? '' : valueBTemp;
-	        if (isDesc) {
-	          if (typeof valueB === 'string') {
-	            result = valueB.localeCompare(valueA);
-	          } else {
-	            result = valueA > valueB ? -1 : valueA < valueB ? 1 : 0;
-	          }
-	        } else {
-	          if (typeof valueA === 'string') {
-	            result = valueA.localeCompare(valueB);
-	          } else {
-	            result = valueA < valueB ? -1 : valueA > valueB ? 1 : 0;
-	          }
-	        }
-	      }
-
-	      if (result !== 0) {
-	        return result;
-	      }
-	    }
-
-	    return result;
-	  });
-
-	  return arr;
-	}
-
 	var TableDataStore = function () {
 	  function TableDataStore(data) {
 	    _classCallCheck(this, TableDataStore);
@@ -14485,11 +14433,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'getRowByKey',
 	    value: function getRowByKey(keys) {
-	      var _this2 = this;
+	      var _this = this;
 
 	      return keys.map(function (key) {
-	        var result = _this2.data.filter(function (d) {
-	          return d[_this2.keyField] === key;
+	        var result = _this.data.filter(function (d) {
+	          return d[_this.keyField] === key;
 	        });
 	        if (result.length !== 0) return result[0];
 	      });
@@ -14518,14 +14466,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'ignoreNonSelected',
 	    value: function ignoreNonSelected() {
-	      var _this3 = this;
+	      var _this2 = this;
 
 	      this.showOnlySelected = !this.showOnlySelected;
 	      if (this.showOnlySelected) {
 	        this.isOnFilter = true;
 	        this.filteredData = this.data.filter(function (row) {
-	          var result = _this3.selected.find(function (x) {
-	            return row[_this3.keyField] === x;
+	          var result = _this2.selected.find(function (x) {
+	            return row[_this2.keyField] === x;
 	          });
 	          return typeof result !== 'undefined' ? true : false;
 	        });
@@ -14612,16 +14560,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'remove',
 	    value: function remove(rowKey) {
-	      var _this4 = this;
+	      var _this3 = this;
 
 	      var currentDisplayData = this.getCurrentDisplayData();
 	      var result = currentDisplayData.filter(function (row) {
-	        return rowKey.indexOf(row[_this4.keyField]) === -1;
+	        return rowKey.indexOf(row[_this3.keyField]) === -1;
 	      });
 
 	      if (this.isOnFilter) {
 	        this.data = this.data.filter(function (row) {
-	          return rowKey.indexOf(row[_this4.keyField]) === -1;
+	          return rowKey.indexOf(row[_this3.keyField]) === -1;
 	        });
 	        this.filteredData = result;
 	      } else {
@@ -14822,7 +14770,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_filter',
 	    value: function _filter(source) {
-	      var _this5 = this;
+	      var _this4 = this;
 
 	      var filterObj = this.filterObj;
 	      this.filteredData = source.filter(function (row, r) {
@@ -14870,11 +14818,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	              filterFormatted = void 0,
 	              formatExtraData = void 0,
 	              filterValue = void 0;
-	          if (_this5.colInfos[key]) {
-	            format = _this5.colInfos[key].format;
-	            filterFormatted = _this5.colInfos[key].filterFormatted;
-	            formatExtraData = _this5.colInfos[key].formatExtraData;
-	            filterValue = _this5.colInfos[key].filterValue;
+	          if (_this4.colInfos[key]) {
+	            format = _this4.colInfos[key].format;
+	            filterFormatted = _this4.colInfos[key].filterFormatted;
+	            formatExtraData = _this4.colInfos[key].formatExtraData;
+	            filterValue = _this4.colInfos[key].filterValue;
 	            if (filterFormatted && format) {
 	              targetVal = format(row[key], row, formatExtraData, r);
 	            } else if (filterValue) {
@@ -14885,23 +14833,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	          switch (filterObj[key].type) {
 	            case _Const2.default.FILTER_TYPE.NUMBER:
 	              {
-	                valid = _this5.filterNumber(targetVal, filterVal, filterObj[key].value.comparator);
+	                valid = _this4.filterNumber(targetVal, filterVal, filterObj[key].value.comparator);
 	                break;
 	              }
 	            case _Const2.default.FILTER_TYPE.DATE:
 	              {
-	                valid = _this5.filterDate(targetVal, filterVal, filterObj[key].value.comparator);
+	                valid = _this4.filterDate(targetVal, filterVal, filterObj[key].value.comparator);
 	                break;
 	              }
 	            case _Const2.default.FILTER_TYPE.REGEX:
 	              {
-	                valid = _this5.filterRegex(targetVal, filterVal);
+	                valid = _this4.filterRegex(targetVal, filterVal);
 	                break;
 	              }
 	            case _Const2.default.FILTER_TYPE.CUSTOM:
 	              {
 	                var cond = filterObj[key].props ? filterObj[key].props.cond : _Const2.default.FILTER_COND_LIKE;
-	                valid = _this5.filterCustom(targetVal, filterVal, filterObj[key].value, cond);
+	                valid = _this4.filterCustom(targetVal, filterVal, filterObj[key].value, cond);
 	                break;
 	              }
 	            default:
@@ -14910,7 +14858,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                  filterVal = format(filterVal, row, formatExtraData, r);
 	                }
 	                var _cond = filterObj[key].props ? filterObj[key].props.cond : _Const2.default.FILTER_COND_LIKE;
-	                valid = _this5.filterText(targetVal, filterVal, _cond);
+	                valid = _this4.filterText(targetVal, filterVal, _cond);
 	                break;
 	              }
 	          }
@@ -14943,7 +14891,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_search',
 	    value: function _search(source) {
-	      var _this6 = this;
+	      var _this5 = this;
 
 	      var searchTextArray = [];
 
@@ -14953,7 +14901,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        searchTextArray.push(this.searchText);
 	      }
 	      this.filteredData = source.filter(function (row, r) {
-	        var keys = _this6.getKeysFromObject(row);
+	        var keys = _this5.getKeysFromObject(row);
 	        var valid = false;
 	        // for loops are ugly, but performance matters here.
 	        // And you cant break from a forEach.
@@ -14966,8 +14914,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	          if (!isNaN(cellValue) && parseInt(cellValue, 10) === 0) {
 	            filterSpecialNum = true;
 	          }
-	          if (_this6.colInfos[key] && (cellValue || filterSpecialNum)) {
-	            var _colInfos$key = _this6.colInfos[key],
+	          if (_this5.colInfos[key] && (cellValue || filterSpecialNum)) {
+	            var _colInfos$key = _this5.colInfos[key],
 	                format = _colInfos$key.format,
 	                filterFormatted = _colInfos$key.filterFormatted,
 	                filterValue = _colInfos$key.filterValue,
@@ -14998,7 +14946,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_sort',
 	    value: function _sort(arr) {
-	      var _this7 = this;
+	      var _this6 = this;
 
 	      if (this.sortList.length === 0 || typeof this.sortList[0] === 'undefined') {
 	        return arr;
@@ -15007,20 +14955,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	      arr.sort(function (a, b) {
 	        var result = 0;
 
-	        for (var i = 0; i < _this7.sortList.length; i++) {
-	          var sortDetails = _this7.sortList[i];
+	        for (var i = 0; i < _this6.sortList.length; i++) {
+	          var sortDetails = _this6.sortList[i];
 	          var isDesc = sortDetails.order.toLowerCase() === _Const2.default.SORT_DESC;
 
-	          var _colInfos$sortDetails2 = _this7.colInfos[sortDetails.sortField],
-	              sortFunc = _colInfos$sortDetails2.sortFunc,
-	              sortFuncExtraData = _colInfos$sortDetails2.sortFuncExtraData;
+	          var _colInfos$sortDetails = _this6.colInfos[sortDetails.sortField],
+	              sortFunc = _colInfos$sortDetails.sortFunc,
+	              sortFuncExtraData = _colInfos$sortDetails.sortFuncExtraData;
 
 
 	          if (sortFunc) {
 	            result = sortFunc(a, b, sortDetails.order, sortDetails.sortField, sortFuncExtraData);
 	          } else {
-	            var valueA = a[sortDetails.sortField] === null ? '' : a[sortDetails.sortField];
-	            var valueB = b[sortDetails.sortField] === null ? '' : b[sortDetails.sortField];
+	            var valueATemp = _getByPath(sortDetails.sortField, a);
+	            var valueBTemp = _getByPath(sortDetails.sortField, b);
+	            var valueA = valueATemp === null ? '' : valueATemp;
+	            var valueB = valueBTemp === null ? '' : valueBTemp;
 	            if (isDesc) {
 	              if (typeof valueB === 'string') {
 	                result = valueB.localeCompare(valueA);
@@ -15094,10 +15044,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'getAllRowkey',
 	    value: function getAllRowkey() {
-	      var _this8 = this;
+	      var _this7 = this;
 
 	      return this.data.map(function (row) {
-	        return row[_this8.keyField];
+	        return row[_this7.keyField];
 	      });
 	    }
 	  }]);
@@ -15114,8 +15064,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  __REACT_HOT_LOADER__.register(_getByPath, '_getByPath', '/home/echaouchna/workspace/cloudwatt/react-bootstrap-tab/src/store/TableDataStore.js');
-
-	  __REACT_HOT_LOADER__.register(_sort, '_sort', '/home/echaouchna/workspace/cloudwatt/react-bootstrap-tab/src/store/TableDataStore.js');
 
 	  __REACT_HOT_LOADER__.register(TableDataStore, 'TableDataStore', '/home/echaouchna/workspace/cloudwatt/react-bootstrap-tab/src/store/TableDataStore.js');
 	}();
